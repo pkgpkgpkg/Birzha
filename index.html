@@ -229,6 +229,8 @@
       width: 34px;
       height: 34px;
       border-radius: var(--radius-sm);
+      background-color: var(--bg-elevated);
+      border: 1px solid var(--border-focus);
       overflow: hidden;
       display: flex;
       align-items: center;
@@ -2159,24 +2161,7 @@
           userIdDisplay.textContent = displayName;
         }
 
-        if (authHeaderBtn) {
-          authHeaderBtn.innerHTML = `
-            <span class="status-dot" style="background-color: var(--accent-emerald); box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);"></span>
-            <span>${tgUser.username ? '@' + tgUser.username : tgUser.first_name}</span>
-          `;
-        }
-
-        const profileStatusEl = document.querySelector('.profile-status');
-        if (profileStatusEl) {
-          profileStatusEl.innerHTML = `
-            <i data-lucide="check-circle" width="13" height="13"></i>
-            <span>Авторизован в Telegram</span>
-          `;
-          profileStatusEl.style.color = 'var(--accent-emerald)';
-          profileStatusEl.style.backgroundColor = 'var(--accent-emerald-dim)';
-          profileStatusEl.style.borderColor = 'rgba(16, 185, 129, 0.25)';
-          lucide.createIcons();
-        }
+        // Статус оставляем неизменным ("Вход не выполнен"), меняем только имя/ID и аватарку
 
         const avatarContainer = document.querySelector('.avatar-placeholder');
         if (avatarContainer && tgUser.photo_url) {
