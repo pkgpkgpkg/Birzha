@@ -1,0 +1,2495 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>BestRels — Биржа микрозадач</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Telegram Mini Apps Official SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --bg-deep: #0F1115;
+      --bg-surface: rgba(22, 25, 32, 0.86);
+      --bg-elevated: #1E222D;
+      --bg-hover: #252A37;
+      --border-subtle: rgba(38, 43, 56, 0.9);
+      --border-focus: #3B4254;
+      
+      --text-primary: #F3F4F6;
+      --text-secondary: #9CA3AF;
+      --text-muted: #6B7280;
+      
+      --accent-emerald: #10B981;
+      --accent-emerald-dim: rgba(16, 185, 129, 0.14);
+      --accent-steel: #3B82F6;
+      --accent-steel-dim: rgba(59, 130, 246, 0.14);
+      --accent-amber: #F59E0B;
+      --accent-amber-dim: rgba(245, 158, 11, 0.14);
+      --danger: #EF4444;
+      
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+      --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.35);
+      --shadow-modal: 0 -10px 40px rgba(0, 0, 0, 0.65);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Roboto', sans-serif;
+      background-color: #08090C;
+      color: var(--text-primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* App Container */
+    .app-shell {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      background-color: var(--bg-deep);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+      border-left: 1px solid rgba(255, 255, 255, 0.04);
+      border-right: 1px solid rgba(255, 255, 255, 0.04);
+      padding-bottom: 88px;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    /* Animated Iridescent Ambient Background Objects */
+    .ambient-bg {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 430px;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 0%, rgba(22, 28, 40, 0.55) 0%, rgba(15, 17, 21, 0.95) 85%);
+    }
+
+    .ambient-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(55px);
+      opacity: 0.42;
+      will-change: transform;
+    }
+
+    .orb-emerald {
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.45) 0%, rgba(16, 185, 129, 0) 70%);
+      top: 6%;
+      left: -60px;
+      animation: floatOrb1 14s ease-in-out infinite alternate;
+    }
+
+    .orb-steel {
+      width: 270px;
+      height: 270px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, rgba(59, 130, 246, 0) 70%);
+      top: 38%;
+      right: -80px;
+      animation: floatOrb2 18s ease-in-out infinite alternate;
+    }
+
+    .orb-amber {
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.3) 0%, rgba(245, 158, 11, 0) 70%);
+      bottom: 12%;
+      left: 10%;
+      animation: floatOrb3 16s ease-in-out infinite alternate;
+    }
+
+    /* Floating Shimmering Geometric Shapes */
+    .ambient-shape {
+      position: absolute;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.005) 100%);
+      border-radius: 20px;
+      backdrop-filter: blur(2px);
+      will-change: transform;
+    }
+
+    .shape-1 {
+      width: 90px;
+      height: 90px;
+      top: 18%;
+      right: 12%;
+      transform: rotate(15deg);
+      animation: floatShape1 12s ease-in-out infinite alternate;
+    }
+
+    .shape-2 {
+      width: 64px;
+      height: 64px;
+      top: 56%;
+      left: 8%;
+      border-radius: 14px;
+      transform: rotate(-20deg);
+      animation: floatShape2 15s ease-in-out infinite alternate;
+    }
+
+    .shape-3 {
+      width: 110px;
+      height: 110px;
+      bottom: 22%;
+      right: 8%;
+      border-radius: 28px;
+      transform: rotate(35deg);
+      animation: floatShape3 19s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatOrb1 {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(90px, 60px) scale(1.18); }
+      100% { transform: translate(30px, 140px) scale(0.95); }
+    }
+
+    @keyframes floatOrb2 {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-80px, -50px) scale(1.12); }
+      100% { transform: translate(-40px, 90px) scale(0.92); }
+    }
+
+    @keyframes floatOrb3 {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(70px, -70px) scale(1.15); }
+      100% { transform: translate(-30px, -20px) scale(1.05); }
+    }
+
+    @keyframes floatShape1 {
+      0% { transform: translateY(0) rotate(15deg); opacity: 0.35; }
+      100% { transform: translateY(35px) rotate(45deg); opacity: 0.7; }
+    }
+
+    @keyframes floatShape2 {
+      0% { transform: translateY(0) rotate(-20deg); opacity: 0.3; }
+      100% { transform: translateY(-40px) rotate(12deg); opacity: 0.65; }
+    }
+
+    @keyframes floatShape3 {
+      0% { transform: translateY(0) rotate(35deg); opacity: 0.25; }
+      100% { transform: translateY(-30px) rotate(5deg); opacity: 0.55; }
+    }
+
+    /* Top Header: Logo + Auth Status + Balance on the SAME level */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 25;
+      background-color: rgba(15, 17, 21, 0.9);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    /* Logo container linking to logo.png */
+    .brand-logo-box {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .brand-logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .brand-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .header-right-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .auth-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s var(--ease-in-out);
+      white-space: nowrap;
+      max-width: 145px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .auth-status-badge:hover {
+      background-color: var(--bg-elevated);
+      border-color: var(--border-focus);
+      color: var(--text-primary);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--accent-amber);
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+      flex-shrink: 0;
+    }
+
+    /* Compact Balance Pill on Header Level */
+    .header-balance-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.16), rgba(16, 185, 129, 0.06));
+      border: 1px solid rgba(16, 185, 129, 0.32);
+      padding: 6px 11px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s var(--ease-in-out);
+      white-space: nowrap;
+    }
+
+    .header-balance-pill:hover {
+      border-color: var(--accent-emerald);
+      background: rgba(16, 185, 129, 0.22);
+    }
+
+    .header-balance-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      transition: transform 0.25s ease, color 0.25s ease;
+    }
+
+    .header-balance-val.pulse-up {
+      color: var(--accent-emerald);
+      transform: scale(1.06);
+    }
+
+    .header-balance-cur {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-emerald);
+    }
+
+    /* Screens / Tabs */
+    .screen {
+      display: none;
+      flex-direction: column;
+      padding: 14px 16px 24px;
+      animation: fadeScreen 0.28s var(--ease-out);
+      position: relative;
+      z-index: 2;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    @keyframes fadeScreen {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Clean & Friendly Onboarding Strip (Fixed Spacing for Ticker) */
+    .main-hero-strip {
+      background: linear-gradient(145deg, rgba(24, 28, 38, 0.9) 0%, rgba(19, 22, 29, 0.9) 100%);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 14px 15px;
+      margin-bottom: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .live-activity-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent-emerald);
+      background-color: var(--accent-emerald-dim);
+      border: 1px solid rgba(16, 185, 129, 0.22);
+      padding: 5px 12px;
+      border-radius: 999px;
+      width: 100%;
+    }
+
+    .live-pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: var(--accent-emerald);
+      animation: livePulse 1.8s infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes livePulse {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    .steps-guide {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .step-chip {
+      background-color: rgba(15, 17, 21, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius-sm);
+      padding: 8px 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .step-num {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent-steel);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .step-text {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.25;
+    }
+
+    /* Filter Chips */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 14px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .filter-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-chip {
+      background-color: var(--bg-surface);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 7px 13px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .filter-chip.active {
+      background-color: var(--bg-elevated);
+      border-color: var(--accent-steel);
+      color: var(--text-primary);
+    }
+
+    /* Section Header */
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .section-note {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background-color: rgba(30, 34, 45, 0.75);
+      border: 1px solid var(--border-subtle);
+      padding: 4px 9px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    /* Task Cards List */
+    .tasks-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .task-card {
+      background-color: var(--bg-surface);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 14px 15px;
+      transition: transform 0.22s var(--ease-out), border-color 0.22s ease, background-color 0.22s ease;
+      position: relative;
+      overflow: hidden;
+      animation: cardSlideIn 0.35s var(--ease-out) backwards;
+    }
+
+    .task-card:nth-child(1) { animation-delay: 0.03s; }
+    .task-card:nth-child(2) { animation-delay: 0.07s; }
+    .task-card:nth-child(3) { animation-delay: 0.11s; }
+    .task-card:nth-child(4) { animation-delay: 0.15s; }
+    .task-card:nth-child(5) { animation-delay: 0.19s; }
+    .task-card:nth-child(6) { animation-delay: 0.23s; }
+
+    @keyframes cardSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .task-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-focus);
+      background-color: rgba(25, 29, 38, 0.94);
+    }
+
+    /* Left Color Accent Bar by Tier */
+    .task-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background-color: var(--accent-steel);
+    }
+
+    .task-card.tier-premium::before {
+      background-color: var(--accent-emerald);
+    }
+
+    .task-card.tier-vip::before {
+      background-color: var(--accent-amber);
+    }
+
+    .task-card.tier-vip {
+      background: linear-gradient(160deg, rgba(25, 29, 38, 0.92) 0%, rgba(21, 24, 32, 0.92) 100%);
+      border-color: rgba(245, 158, 11, 0.28);
+    }
+
+    .task-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .task-title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .task-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent-steel);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .task-tag.emerald {
+      color: var(--accent-emerald);
+    }
+
+    .task-tag.amber {
+      color: var(--accent-amber);
+    }
+
+    .task-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.35;
+    }
+
+    .task-reward {
+      background-color: var(--accent-emerald-dim);
+      border: 1px solid rgba(16, 185, 129, 0.28);
+      color: var(--accent-emerald);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+    }
+
+    .task-card.tier-vip .task-reward {
+      background-color: var(--accent-amber-dim);
+      border-color: rgba(245, 158, 11, 0.35);
+      color: var(--accent-amber);
+    }
+
+    .task-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      line-height: 1.45;
+    }
+
+    .task-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      padding-top: 10px;
+    }
+
+    .task-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .task-meta-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-task {
+      background-color: var(--bg-elevated);
+      border: 1px solid var(--border-focus);
+      color: var(--text-primary);
+      padding: 7px 13px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s var(--ease-in-out);
+    }
+
+    .btn-task:hover {
+      background-color: var(--accent-steel);
+      border-color: var(--accent-steel);
+      color: #FFFFFF;
+    }
+
+    .btn-task:active {
+      transform: scale(0.96);
+    }
+
+    /* Footer Refresh Info Note */
+    .daily-update-note {
+      margin-top: 14px;
+      padding: 11px 14px;
+      background-color: rgba(22, 25, 32, 0.78);
+      backdrop-filter: blur(8px);
+      border: 1px dashed var(--border-focus);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    /* Profile Screen */
+    .profile-card {
+      background-color: var(--bg-surface);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .profile-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .avatar-placeholder {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background-color: var(--bg-elevated);
+      border: 1px solid var(--border-focus);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .profile-id {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .profile-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent-amber);
+      background-color: var(--accent-amber-dim);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      padding: 3px 9px;
+      border-radius: 6px;
+      width: fit-content;
+    }
+
+    .auth-buttons-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .btn-auth {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s var(--ease-in-out);
+      border: 1px solid var(--border-focus);
+      background-color: var(--bg-elevated);
+      color: var(--text-primary);
+    }
+
+    .btn-auth.accent {
+      background-color: var(--accent-steel);
+      border-color: var(--accent-steel);
+      color: #FFFFFF;
+    }
+
+    .btn-auth.accent:hover {
+      background-color: #2563EB;
+    }
+
+    .btn-auth:hover {
+      background-color: var(--bg-hover);
+    }
+
+    .profile-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .action-tile {
+      background-color: var(--bg-surface);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.2s var(--ease-in-out);
+      text-align: left;
+      width: 100%;
+      color: var(--text-primary);
+    }
+
+    .action-tile:hover {
+      background-color: var(--bg-elevated);
+      border-color: var(--border-focus);
+    }
+
+    .action-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .action-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background-color: var(--bg-elevated);
+      border: 1px solid var(--border-focus);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      flex-shrink: 0;
+    }
+
+    .action-icon.emerald {
+      color: var(--accent-emerald);
+      background-color: var(--accent-emerald-dim);
+      border-color: rgba(16, 185, 129, 0.25);
+    }
+
+    .action-icon.steel {
+      color: var(--accent-steel);
+      background-color: var(--accent-steel-dim);
+      border-color: rgba(59, 130, 246, 0.25);
+    }
+
+    .action-text-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .action-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .action-subtitle {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .security-card {
+      background-color: var(--bg-surface);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .security-card i {
+      color: var(--text-muted);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .security-text {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+    }
+
+    /* Bottom Navigation Bar (4 Buttons: Главное, Выплата, Рефералы, Профиль) */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 430px;
+      background-color: rgba(22, 25, 32, 0.96);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-top: 1px solid var(--border-subtle);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 8px 8px 14px;
+      z-index: 30;
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 6px 0;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.2s ease, transform 0.15s ease;
+    }
+
+    .nav-btn.active {
+      color: var(--text-primary);
+    }
+
+    .nav-btn.active .nav-icon-wrap {
+      background-color: var(--bg-elevated);
+      border-color: var(--border-focus);
+      color: var(--accent-emerald);
+    }
+
+    .nav-icon-wrap {
+      width: 36px;
+      height: 28px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    /* Modals / Bottom Sheets */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 50;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s var(--ease-in-out);
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .bottom-sheet {
+      width: 100%;
+      max-width: 430px;
+      max-height: 90vh;
+      background-color: #161920;
+      border-top: 1px solid var(--border-focus);
+      border-radius: 22px 22px 0 0;
+      padding: 16px 20px 28px;
+      box-shadow: var(--shadow-modal);
+      transform: translateY(100%);
+      transition: transform 0.32s var(--ease-out);
+      overflow-y: auto;
+    }
+
+    .modal-backdrop.open .bottom-sheet {
+      transform: translateY(0);
+    }
+
+    .sheet-handle {
+      width: 38px;
+      height: 4px;
+      background-color: var(--border-focus);
+      border-radius: 999px;
+      margin: 0 auto 14px;
+    }
+
+    .sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .sheet-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .sheet-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background-color: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 7px;
+    }
+
+    .form-hint {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    .input-control {
+      width: 100%;
+      background-color: var(--bg-deep);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .input-control::placeholder {
+      color: var(--text-muted);
+    }
+
+    .input-control:focus {
+      border-color: var(--accent-steel);
+      background-color: #12151B;
+    }
+
+    .input-control.input-error {
+      border-color: var(--danger);
+    }
+
+    .field-error-msg {
+      display: none;
+      font-size: 12px;
+      color: var(--danger);
+      margin-top: 6px;
+      line-height: 1.35;
+    }
+
+    .field-error-msg.visible {
+      display: block;
+    }
+
+    /* Custom Bank Selector */
+    .bank-select-trigger {
+      width: 100%;
+      background-color: var(--bg-deep);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 11px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: border-color 0.2s ease;
+    }
+
+    .selected-bank-display {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .bank-dropdown-panel {
+      display: none;
+      margin-top: 8px;
+      background-color: var(--bg-deep);
+      border: 1px solid var(--border-focus);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .bank-dropdown-panel.open {
+      display: block;
+    }
+
+    .bank-search-input {
+      width: 100%;
+      background-color: #161920;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 9px 12px;
+      font-size: 13px;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      outline: none;
+    }
+
+    .bank-group-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin: 8px 4px 6px;
+    }
+
+    .bank-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+
+    .bank-option:hover {
+      background-color: var(--bg-elevated);
+    }
+
+    .bank-option.selected {
+      background-color: var(--bg-elevated);
+      border: 1px solid var(--border-focus);
+    }
+
+    .bank-option-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bank-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #FFFFFF;
+      flex-shrink: 0;
+    }
+
+    .bank-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background-color: var(--accent-emerald);
+      border: 1px solid var(--accent-emerald);
+      color: #052016;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 13px 18px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      margin-top: 6px;
+    }
+
+    .btn-submit:hover {
+      background-color: #14CC90;
+    }
+
+    .payout-success-box {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 16px 8px 8px;
+    }
+
+    .payout-success-box.visible {
+      display: flex;
+    }
+
+    .success-icon-ring {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background-color: var(--accent-emerald-dim);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: var(--accent-emerald);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .success-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .success-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    /* Referral Screen (Fixed Copy Button Layout) */
+    .ref-link-box {
+      background-color: var(--bg-surface);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .ref-input-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .ref-input-stack .input-control {
+      font-size: 13px;
+      text-overflow: ellipsis;
+    }
+
+    .btn-copy {
+      width: 100%;
+      background-color: var(--accent-steel);
+      border: 1px solid var(--accent-steel);
+      color: #FFFFFF;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: background-color 0.2s ease, transform 0.15s ease;
+    }
+
+    .btn-copy:hover {
+      background-color: #2563EB;
+    }
+
+    .btn-copy:active {
+      transform: scale(0.98);
+    }
+
+    .ref-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .ref-stat-card {
+      background-color: var(--bg-surface);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .ref-stat-val {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .ref-stat-lbl {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.3;
+    }
+
+    .ref-terms-card {
+      background-color: var(--bg-surface);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+    }
+
+    .ref-terms-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ref-terms-text {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      width: calc(100% - 36px);
+      max-width: 394px;
+      background-color: var(--bg-elevated);
+      border: 1px solid var(--border-focus);
+      border-left: 3px solid var(--accent-emerald);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.28s var(--ease-out);
+    }
+
+    .toast-container.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast-icon {
+      color: var(--accent-emerald);
+      flex-shrink: 0;
+      display: flex;
+    }
+
+    .toast-message {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    /* Ripple Effect */
+    .ripple-host {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ripple-circle {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      animation: rippleAnim 0.55s linear;
+      background-color: rgba(255, 255, 255, 0.14);
+      pointer-events: none;
+    }
+
+    @keyframes rippleAnim {
+      to {
+        transform: scale(3.5);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-shell">
+    <!-- Dynamic Shimmering Background Objects -->
+    <div class="ambient-bg" aria-hidden="true">
+      <div class="ambient-orb orb-emerald"></div>
+      <div class="ambient-orb orb-steel"></div>
+      <div class="ambient-orb orb-amber"></div>
+      <div class="ambient-shape shape-1"></div>
+      <div class="ambient-shape shape-2"></div>
+      <div class="ambient-shape shape-3"></div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast-container" role="status" aria-live="polite">
+      <div class="toast-icon"><i data-lucide="check-circle-2" width="18" height="18"></i></div>
+      <div id="toastText" class="toast-message">Операция выполнена</div>
+    </div>
+
+    <!-- Header: Logo (logo.png) + Auth Status + Balance on the SAME row -->
+    <header class="app-header">
+      <div class="brand-group">
+        <div class="brand-logo-box" title="Логотип BestRels">
+          <img src="logo.png" alt="" class="brand-logo-img" onerror="this.style.opacity='0'" />
+        </div>
+        <span class="brand-title">BestRels</span>
+      </div>
+
+      <div class="header-right-controls">
+        <button id="authHeaderBtn" class="auth-status-badge ripple-host" type="button">
+          <span class="status-dot"></span>
+          <span>Вход не выполнен</span>
+        </button>
+
+        <button id="headerBalanceBtn" class="header-balance-pill ripple-host" type="button" title="Перейти к выплате">
+          <span id="balanceCounter" class="header-balance-val">150.00</span>
+          <span class="header-balance-cur">₽</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- SCREEN 1: MAIN MENU (TASKS EXCHANGE) -->
+    <main id="screen-tasks" class="screen active">
+      <!-- Clean Welcome Strip without cramped right label -->
+      <div class="main-hero-strip">
+        <div class="hero-top-row">
+          <div class="live-activity-pill">
+            <span class="live-pulse-dot"></span>
+            <span id="liveTickerText">Выплаты СБП активны 24/7</span>
+          </div>
+        </div>
+
+        <div class="steps-guide">
+          <div class="step-chip">
+            <span class="step-num">Шаг 1</span>
+            <span class="step-text">Выберите задачу</span>
+          </div>
+          <div class="step-chip">
+            <span class="step-num">Шаг 2</span>
+            <span class="step-text">Выполните условие</span>
+          </div>
+          <div class="step-chip">
+            <span class="step-num">Шаг 3</span>
+            <span class="step-text">Выведите на СБП</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Category Filter -->
+      <div class="filter-bar">
+        <button class="filter-chip active" data-filter="all" type="button">Все задания (8)</button>
+        <button class="filter-chip" data-filter="high" type="button">Высокая оплата (50–200 ₽)</button>
+        <button class="filter-chip" data-filter="quick" type="button">Быстрые (20–30 ₽)</button>
+      </div>
+
+      <div class="section-head">
+        <h2 class="section-title">Доступные задания</h2>
+        <span class="section-note">
+          <i data-lucide="refresh-cw" width="11" height="11" style="color: var(--accent-steel);"></i>
+          Обновление раз в 24ч
+        </span>
+      </div>
+
+      <div id="tasksListContainer" class="tasks-list">
+        <!-- 1. Invite 2 friends for 150 RUB -->
+        <article class="task-card tier-vip" data-category="high">
+          <div class="task-top">
+            <div class="task-title-wrap">
+              <span class="task-tag amber">
+                <i data-lucide="award" width="12" height="12"></i>
+                Спецзадание
+              </span>
+              <h3 class="task-title">Пригласить 2 друзей по персональной ссылке</h3>
+            </div>
+            <div class="task-reward">+150.00 ₽</div>
+          </div>
+          <p class="task-desc">
+            Скопируйте вашу ссылку в разделе «Рефералы» и отправьте 2 друзьям. Вознаграждение начисляется автоматически сразу после их первого запуска бота.
+          </p>
+          <div class="task-footer">
+            <div class="task-meta">
+              <span class="task-meta-item">
+                <i data-lucide="users" width="13" height="13"></i>
+                2 друга
+              </span>
+              <span class="task-meta-item">
+                <i data-lucide="zap" width="13" height="13"></i>
+                Автозачисление
+              </span>
+            </div>
+            <button class="btn-task go-referrals-task ripple-host" type="button">
+              <span>К ссылке</span>
+              <i data-lucide="arrow-right" width="13" height="13"></i>
+            </button>
+          </div>
+        </article>
+
+        <!-- 2. Bio link for 24 hours for 100 RUB -->
+        <article class="task-card tier-vip" data-category="high">
+          <div class="task-top">
+            <div class="task-title-wrap">
+              <span class="task-tag amber">
+                <i data-lucide="sparkles" width="12" height="12"></i>
+                Промо-задание
+              </span>
+              <h3 class="task-title">Разместить ссылку на бота в описании профиля на 24 часа</h3>
+            </div>
+            <div class="task-reward">+100.00 ₽</div>
+          </div>
+          <p class="task-desc">
+            Установите реферальную ссылку на бота в графу «О себе» (Bio) вашего Telegram-аккаунта и не удаляйте ее в течение 24 часов. Проверка ботом автоматическая.
+          </p>
+          <div class="task-footer">
+            <div class="task-meta">
+              <span class="task-meta-item">
+                <i data-lucide="clock" width="13" height="13"></i>
+                24 часа
+              </span>
+              <span class="task-meta-item">
+                <i data-lucide="shield-check" width="13" height="13"></i>
+                Проверка по API
+              </span>
+            </div>
+            <button class="btn-task auth-required-task ripple-host" type="button">
+              <span>Приступить</span>
+              <i data-lucide="arrow-right" width="13" height="13"></i>
+            </button>
+          </div>
+        </article>
+
+        <!-- 3. Expensive Task (200 RUB) -->
+        <article class="task-card tier-premium" data-category="high">
+          <div class="task-top">
+            <div class="task-title-wrap">
+              <span class="task-tag emerald">Премиум заказ</span>
+              <h3 class="task-title">Комплексное тестирование крипто-кошелька в Telegram</h3>
+            </div>
+            <div class="task-reward">+200.00 ₽</div>
+          </div>
+          <p class="task-desc">
+            Активируйте партнерское WebApp-приложение, создайте демо-счет в тестовой сети и совершите 3 тестовых обмена внутри интерфейса.
+          </p>
+          <div class="task-footer">
+            <div class="task-meta">
+              <span class="task-meta-item">
+                <i data-lucide="clock" width="13" height="13"></i>
+                5 мин
+              </span>
+              <span class="task-meta-item">
+                <i data-lucide="users" width="13" height="13"></i>
+                19 мест
+              </span>
+            </div>
+            <button class="btn-task auth-required-task ripple-host" type="button">
+              <span>Приступить</span>
+              <i data-lucide="arrow-right" width="13" height="13"></i>
+            </button>
+          </div>
+        </article>
+
+        <!-- 4. Expensive Task (120 RUB) -->
+        <article class="task-card tier-premium" data-category="high">
+          <div class="task-top">
+            <div class="task-title-wrap">
+              <span class="task-tag emerald">Аналитика и отзыв</span>
+              <h3 class="task-title">Развернутый отзыв о работе финтех-сервиса</h3>
+            </div>
+            <div class="task-reward">+120.00 ₽</div>
+          </div>
+          <p class="task-desc">
+            Протестируйте калькулятор доходности в боте заказчика и отправьте короткий текстовый комментарий (от 150 символов) через форму обратной связи.
+          </p>
+          <div class="task-footer">
+            <div class="task-meta">
+              <span class="task-meta-item">
+                <i data-lucide="clock" width="13" height="13"></i>
+                4 мин
+              </span>
+              <span class="task-meta-item">
+                <i data-lucide="users" width="13" height="13"></i>
+                34 места
+              </span>
+            </div>
+            <button class="btn-task auth-required-task ripple-host" type="button">
+              <span>Приступить</span>
+              <i data-lucide="arrow-right" width="13" height="13"></i>
+            </button>
+          </div>
+        </article>
+
+        <!-- 5. High/Medium Task (65 RUB) -->
+        <article class="task-card tier-premium" data-category="high">
+          <div class="task-top">
+            <div class="task-title-wrap">
+              <span class="task-tag emerald">Подписка на пул</span>
+              <h3 class="task-title">Подписка на 3 новостных канала инвестиционного холдинга</h3>
+            </div>
+            <div class="task-reward">+65.00 ₽</div>
+          </div>
+          <p class="task-desc">
+            Подпишитесь на три верифицированных канала из подборки и включите уведомления хотя бы на одном из них. Удержание подписки — 5 дней.
+          </p>
+          <div class="task-footer">
+            <div class="task-meta">
+              <span class="task-meta-item">
+                <i data-lucide="clock" width="13" height="13"></i>
+                2 мин
+              </span>
+              <span class="task-meta-item">
+                <i data-lucide="users" width="13" height="13"></i>
+                85 мест
+              </span>
+            </div>
+            <button class="btn-task auth-required-task ripple-host" type="button">
+              <span>Приступить</span>
+              <i data-lucide="arrow-right" width="13" height="13"></i>
+            </button>
+          </div>
+        </article>
+
+        <!-- 6. Quick Task (30 RUB) -->
+        <article class="task-card" data-category="quick">
+          <div class="task-top">
+            <div class="task-title-wrap">
+              <span class="task-tag">Тестирование бота</span>
+              <h3 class="task-title">Запуск и проверка меню ассистента логистики</h3>
+            </div>
+            <div class="task-reward">+30.00 ₽</div>
+          </div>
+          <p class="task-desc">
+            Перейдите в бота, активируйте команду старта и выберите раздел расчета тарифа. Скриншот не требуется, подтверждение по API.
+          </p>
+          <div class="task-footer">
+            <div class="task-meta">
+              <span class="task-meta-item">
+                <i data-lucide="clock" width="13" height="13"></i>
+                1.5 мин
+              </span>
+              <span class="task-meta-item">
+                <i data-lucide="users" width="13" height="13"></i>
+                110 мест
+              </span>
+            </div>
+            <button class="btn-task auth-required-task ripple-host" type="button">
+              <span>Приступить</span>
+              <i data-lucide="arrow-right" width="13" height="13"></i>
+            </button>
+          </div>
+        </article>
+
+        <!-- 7. Quick Task (25 RUB) -->
+        <article class="task-card" data-category="quick">
+          <div class="task-top">
+            <div class="task-title-wrap">
+              <span class="task-tag">Подписка и активность</span>
+              <h3 class="task-title">Подписка на аналитический канал FinPulse</h3>
+            </div>
+            <div class="task-reward">+25.00 ₽</div>
+          </div>
+          <p class="task-desc">
+            Оформите подписку на официальный Telegram-канал заказчика и ознакомьтесь с закрепленной публикацией. Не отписывайтесь 7 дней.
+          </p>
+          <div class="task-footer">
+            <div class="task-meta">
+              <span class="task-meta-item">
+                <i data-lucide="clock" width="13" height="13"></i>
+                1 мин
+              </span>
+              <span class="task-meta-item">
+                <i data-lucide="users" width="13" height="13"></i>
+                195 мест
+              </span>
+            </div>
+            <button class="btn-task auth-required-task ripple-host" type="button">
+              <span>Приступить</span>
+              <i data-lucide="arrow-right" width="13" height="13"></i>
+            </button>
+          </div>
+        </article>
+
+        <!-- 8. Quick Task (20 RUB) -->
+        <article class="task-card" data-category="quick">
+          <div class="task-top">
+            <div class="task-title-wrap">
+              <span class="task-tag">Быстрое действие</span>
+              <h3 class="task-title">Участие в голосовании и реакция на дайджест</h3>
+            </div>
+            <div class="task-reward">+20.00 ₽</div>
+          </div>
+          <p class="task-desc">
+            Выберите вариант ответа в официальном опросе канала и оставьте реакцию под двумя последними публикациями.
+          </p>
+          <div class="task-footer">
+            <div class="task-meta">
+              <span class="task-meta-item">
+                <i data-lucide="clock" width="13" height="13"></i>
+                40 сек
+              </span>
+              <span class="task-meta-item">
+                <i data-lucide="users" width="13" height="13"></i>
+                260 мест
+              </span>
+            </div>
+            <button class="btn-task auth-required-task ripple-host" type="button">
+              <span>Приступить</span>
+              <i data-lucide="arrow-right" width="13" height="13"></i>
+            </button>
+          </div>
+        </article>
+      </div>
+
+      <div class="daily-update-note">
+        <i data-lucide="calendar-clock" width="15" height="15" style="color: var(--accent-steel); flex-shrink: 0;"></i>
+        <span>Список доступных заданий автоматически обновляется каждые 24 часа.</span>
+      </div>
+    </main>
+
+    <!-- SCREEN 2: REFERRAL PROGRAM -->
+    <section id="screen-referrals" class="screen">
+      <div class="section-head">
+        <h2 class="section-title">Реферальная программа</h2>
+        <span class="section-note">Партнерская сеть</span>
+      </div>
+
+      <div class="ref-link-box">
+        <div class="form-label">
+          <span>Персональная ссылка приглашения</span>
+          <span class="form-hint">Telegram Bot Link</span>
+        </div>
+        <div class="ref-input-stack">
+          <input id="refLinkInput" class="input-control" type="text" value="https://t.me/BestRelsBot/g39kab" readonly />
+          <button id="copyRefBtn" class="btn-copy ripple-host" type="button">
+            <i data-lucide="copy" width="16" height="16"></i>
+            <span>Скопировать ссылку</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="ref-stats-grid">
+        <div class="ref-stat-card">
+          <span class="ref-stat-val">0</span>
+          <span class="ref-stat-lbl">Приглашено</span>
+        </div>
+        <div class="ref-stat-card">
+          <span class="ref-stat-val">0</span>
+          <span class="ref-stat-lbl">Активных друзей</span>
+        </div>
+        <div class="ref-stat-card">
+          <span class="ref-stat-val">0 ₽</span>
+          <span class="ref-stat-lbl">Баланс за приглашение</span>
+        </div>
+      </div>
+
+      <div class="ref-terms-card">
+        <div class="ref-terms-title">
+          <i data-lucide="info" width="16" height="16" style="color: var(--accent-steel);"></i>
+          <span>Условия начисления вознаграждений</span>
+        </div>
+        <p class="ref-terms-text">
+          За каждого приглашенного друга вам начисляется вознаграждение от 10 ₽ до 1000 ₽ на основной баланс. Ваш друг сразу получает приветственный бонус 150 ₽ при первом входе.
+        </p>
+      </div>
+    </section>
+
+    <!-- SCREEN 3: PERSONAL PROFILE -->
+    <section id="screen-profile" class="screen">
+      <div class="section-head">
+        <h2 class="section-title">Личный профиль</h2>
+        <span class="section-note">Управление аккаунтом</span>
+      </div>
+
+      <div class="profile-card">
+        <div class="profile-top">
+          <div class="avatar-placeholder">
+            <i data-lucide="user" width="26" height="26"></i>
+          </div>
+          <div class="profile-info">
+            <div class="profile-id">
+              <span id="userIdDisplay">ID: #84920194</span>
+            </div>
+            <div class="profile-status">
+              <i data-lucide="shield-alert" width="13" height="13"></i>
+              <span>Гость / Не авторизован</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="auth-buttons-grid">
+          <a href="https://t.me/BestRelsReg_Bot" target="_blank" rel="noopener noreferrer" class="btn-auth accent ripple-host">
+            <i data-lucide="log-in" width="16" height="16"></i>
+            <span>Вход</span>
+          </a>
+          <a href="https://t.me/BestRelsReg_Bot" target="_blank" rel="noopener noreferrer" class="btn-auth ripple-host">
+            <i data-lucide="user-plus" width="16" height="16"></i>
+            <span>Регистрация</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="profile-actions">
+        <button id="openPayoutModalBtn" class="action-tile ripple-host" type="button">
+          <div class="action-left">
+            <div class="action-icon emerald">
+              <i data-lucide="landmark" width="20" height="20"></i>
+            </div>
+            <div class="action-text-group">
+              <span class="action-title">Выплата</span>
+              <span class="action-subtitle">Вывод средств по номеру СБП в банки РФ</span>
+            </div>
+          </div>
+          <i data-lucide="chevron-right" width="18" height="18" style="color: var(--text-muted);"></i>
+        </button>
+
+        <button id="openReferralScreenBtn" class="action-tile ripple-host" type="button">
+          <div class="action-left">
+            <div class="action-icon steel">
+              <i data-lucide="users" width="20" height="20"></i>
+            </div>
+            <div class="action-text-group">
+              <span class="action-title">Реферальная программа</span>
+              <span class="action-subtitle">От 10 ₽ до 1000 ₽ за приглашенного участника</span>
+            </div>
+          </div>
+          <i data-lucide="chevron-right" width="18" height="18" style="color: var(--text-muted);"></i>
+        </button>
+      </div>
+
+      <div class="security-card">
+        <i data-lucide="lock" width="16" height="16"></i>
+        <p class="security-text">
+          Авторизация через официального Telegram-бота синхронизирует ваш баланс между устройствами и открывает доступ к выполнению заданий.
+        </p>
+      </div>
+    </section>
+
+    <!-- Bottom Navigation (4 Buttons: Главное, Выплата, Рефералы, Профиль) -->
+    <nav class="bottom-nav" aria-label="Нижняя навигация">
+      <button class="nav-btn active" data-target="screen-tasks" type="button">
+        <div class="nav-icon-wrap">
+          <i data-lucide="layout-grid" width="18" height="18"></i>
+        </div>
+        <span>Главное</span>
+      </button>
+      <button id="navWithdrawBtn" class="nav-btn" type="button">
+        <div class="nav-icon-wrap">
+          <i data-lucide="wallet" width="18" height="18"></i>
+        </div>
+        <span>Выплата</span>
+      </button>
+      <button class="nav-btn" data-target="screen-referrals" type="button">
+        <div class="nav-icon-wrap">
+          <i data-lucide="share-2" width="18" height="18"></i>
+        </div>
+        <span>Рефералы</span>
+      </button>
+      <button class="nav-btn" data-target="screen-profile" type="button">
+        <div class="nav-icon-wrap">
+          <i data-lucide="user-check" width="18" height="18"></i>
+        </div>
+        <span>Профиль</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- PAYOUT MODAL (Bottom Sheet) -->
+  <div id="payoutModalBackdrop" class="modal-backdrop" aria-hidden="true">
+    <div class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="payoutSheetTitle">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <h3 id="payoutSheetTitle" class="sheet-title">Оформление выплаты СБП</h3>
+        <button id="closePayoutModalBtn" class="sheet-close" type="button" aria-label="Закрыть">
+          <i data-lucide="x" width="16" height="16"></i>
+        </button>
+      </div>
+
+      <!-- Form View -->
+      <form id="payoutForm" novalidate>
+        <!-- Phone Number -->
+        <div class="form-group">
+          <label class="form-label" for="sbpPhoneInput">
+            <span>Номер телефона СБП</span>
+            <span class="form-hint">Формат РФ</span>
+          </label>
+          <input
+            id="sbpPhoneInput"
+            class="input-control"
+            type="tel"
+            placeholder="+7 (___) ___-__-__"
+            autocomplete="tel"
+            required
+          />
+          <div id="phoneError" class="field-error-msg">Введите корректный номер телефона в формате +7 (XXX) XXX-XX-XX</div>
+        </div>
+
+        <!-- Bank Selector -->
+        <div class="form-group">
+          <label class="form-label">
+            <span>Банк получателя</span>
+            <span class="form-hint">18 банков СБП</span>
+          </label>
+          <div id="bankSelectTrigger" class="bank-select-trigger">
+            <div id="selectedBankDisplay" class="selected-bank-display">
+              <span style="color: var(--text-muted);">Выберите банк из списка</span>
+            </div>
+            <i data-lucide="chevron-down" width="16" height="16" style="color: var(--text-secondary);"></i>
+          </div>
+          <div id="bankError" class="field-error-msg">Пожалуйста, выберите банк для перевода по СБП</div>
+
+          <div id="bankDropdownPanel" class="bank-dropdown-panel">
+            <input id="bankSearchInput" class="bank-search-input" type="text" placeholder="Поиск банка по названию..." />
+            <div id="bankListContainer"></div>
+          </div>
+        </div>
+
+        <!-- Recipient Full Name (Фамилия И.О.) -->
+        <div class="form-group">
+          <label class="form-label" for="recipientNameInput">
+            <span>ФИО получателя</span>
+            <span class="form-hint">Строго: Фамилия И.О.</span>
+          </label>
+          <input
+            id="recipientNameInput"
+            class="input-control"
+            type="text"
+            placeholder="Иванов И.И."
+            required
+          />
+          <div id="nameError" class="field-error-msg">Укажите данные строго в формате «Фамилия И.О.» (например, Иванов И.И.)</div>
+        </div>
+
+        <!-- Withdrawal Amount -->
+        <div class="form-group">
+          <label class="form-label" for="withdrawAmountInput">
+            <span>Сумма вывода</span>
+            <span id="availableBalanceHint" class="form-hint">Доступно: 150.00 ₽</span>
+          </label>
+          <input
+            id="withdrawAmountInput"
+            class="input-control"
+            type="number"
+            step="1"
+            min="1"
+            placeholder="Минимум 1000 ₽"
+            required
+          />
+          <div id="amountError" class="field-error-msg">Минимальная сумма для вывода составляет 1000 ₽</div>
+        </div>
+
+        <button class="btn-submit ripple-host" type="submit">
+          <i data-lucide="send" width="16" height="16"></i>
+          <span>Отправить заявку на выплату</span>
+        </button>
+      </form>
+
+      <!-- Success Status View -->
+      <div id="payoutSuccessView" class="payout-success-box">
+        <div class="success-icon-ring">
+          <i data-lucide="check" width="26" height="26"></i>
+        </div>
+        <h4 class="success-title">Заявка принята в обработку</h4>
+        <p class="success-desc">
+          Заявка на выплату успешно поставлена в очередь. Перевод по СБП поступит в течение 48 часов.
+        </p>
+        <button id="donePayoutBtn" class="btn-submit ripple-host" type="button">
+          <span>Готово</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      lucide.createIcons();
+
+      // --- STATE MANAGEMENT ---
+      const STORAGE_KEYS = {
+        BALANCE: 'bestrels_balance_v2',
+        USER_ID: 'bestrels_uid_v2'
+      };
+
+      let balanceState = parseFloat(localStorage.getItem(STORAGE_KEYS.BALANCE));
+      if (isNaN(balanceState)) {
+        balanceState = 150.00;
+        localStorage.setItem(STORAGE_KEYS.BALANCE, balanceState.toFixed(2));
+      }
+
+      let userNumericId = localStorage.getItem(STORAGE_KEYS.USER_ID);
+      if (!userNumericId) {
+        userNumericId = '84920194';
+        localStorage.setItem(STORAGE_KEYS.USER_ID, userNumericId);
+      }
+
+      // --- BANK DATA (18 Russian Banks) ---
+      const BANKS_DATA = [
+        { id: 'sber', name: 'Сбербанк', group: 'top', color: '#21A038', code: 'СБ' },
+        { id: 'tbank', name: 'Т-Банк (Тинькофф)', group: 'top', color: '#D9A514', code: 'ТБ' },
+        { id: 'alfa', name: 'Альфа-Банк', group: 'top', color: '#EF3124', code: 'АБ' },
+        { id: 'vtb', name: 'ВТБ', group: 'top', color: '#0A2896', code: 'ВТБ' },
+        { id: 'raif', name: 'Райффайзенбанк', group: 'top', color: '#D49B00', code: 'РФ' },
+        { id: 'gazprom', name: 'Газпромбанк', group: 'top', color: '#1F4E8C', code: 'ГПБ' },
+        { id: 'ozon', name: 'Озон Банк', group: 'top', color: '#005BFF', code: 'OZ' },
+        { id: 'yandex', name: 'Яндекс Банк', group: 'top', color: '#FC3F1D', code: 'ЯБ' },
+        { id: 'rosbank', name: 'Росбанк', group: 'extra', color: '#C8102E', code: 'РБ' },
+        { id: 'sovcom', name: 'Совкомбанк', group: 'extra', color: '#003791', code: 'СКБ' },
+        { id: 'mts', name: 'МТС Банк', group: 'extra', color: '#E30611', code: 'МТС' },
+        { id: 'psb', name: 'ПСБ', group: 'extra', color: '#EA5616', code: 'ПСБ' },
+        { id: 'uralsib', name: 'Уралсиб', group: 'extra', color: '#2E2B82', code: 'УС' },
+        { id: 'akbars', name: 'Ак Барс', group: 'extra', color: '#008D4C', code: 'АББ' },
+        { id: 'bspb', name: 'Банк Санкт-Петербург', group: 'extra', color: '#8A1538', code: 'БСП' },
+        { id: 'rnkb', name: 'РНКБ', group: 'extra', color: '#0072BC', code: 'РНК' },
+        { id: 'novikom', name: 'Новикомбанк', group: 'extra', color: '#1B365D', code: 'НКБ' },
+        { id: 'pochta', name: 'Почта Банк', group: 'extra', color: '#00468C', code: 'ПБ' }
+      ];
+
+      let selectedBank = null;
+
+      // --- DOM ELEMENTS ---
+      const balanceCounterEl = document.getElementById('balanceCounter');
+      const availableBalanceHint = document.getElementById('availableBalanceHint');
+      const userIdDisplay = document.getElementById('userIdDisplay');
+      const navButtons = document.querySelectorAll('.nav-btn[data-target]');
+      const navWithdrawBtn = document.getElementById('navWithdrawBtn');
+      const screens = document.querySelectorAll('.screen');
+      const authHeaderBtn = document.getElementById('authHeaderBtn');
+      const headerBalanceBtn = document.getElementById('headerBalanceBtn');
+      const openPayoutModalBtn = document.getElementById('openPayoutModalBtn');
+      const openReferralScreenBtn = document.getElementById('openReferralScreenBtn');
+      const liveTickerText = document.getElementById('liveTickerText');
+
+      // Filter elements
+      const filterChips = document.querySelectorAll('.filter-chip');
+      const taskCards = document.querySelectorAll('#tasksListContainer .task-card');
+
+      // Referral elements
+      const refLinkInput = document.getElementById('refLinkInput');
+      const copyRefBtn = document.getElementById('copyRefBtn');
+
+      // Payout Modal elements
+      const payoutModalBackdrop = document.getElementById('payoutModalBackdrop');
+      const closePayoutModalBtn = document.getElementById('closePayoutModalBtn');
+      const payoutForm = document.getElementById('payoutForm');
+      const payoutSuccessView = document.getElementById('payoutSuccessView');
+      const donePayoutBtn = document.getElementById('donePayoutBtn');
+
+      const sbpPhoneInput = document.getElementById('sbpPhoneInput');
+      const bankSelectTrigger = document.getElementById('bankSelectTrigger');
+      const selectedBankDisplay = document.getElementById('selectedBankDisplay');
+      const bankDropdownPanel = document.getElementById('bankDropdownPanel');
+      const bankSearchInput = document.getElementById('bankSearchInput');
+      const bankListContainer = document.getElementById('bankListContainer');
+      const recipientNameInput = document.getElementById('recipientNameInput');
+      const withdrawAmountInput = document.getElementById('withdrawAmountInput');
+
+      const phoneError = document.getElementById('phoneError');
+      const bankError = document.getElementById('bankError');
+      const nameError = document.getElementById('nameError');
+      const amountError = document.getElementById('amountError');
+
+      // Toast
+      const toastEl = document.getElementById('toast');
+      const toastTextEl = document.getElementById('toastText');
+      let toastTimer = null;
+
+      function showToast(message) {
+        toastTextEl.textContent = message;
+        toastEl.classList.add('show');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toastEl.classList.remove('show');
+        }, 3200);
+      }
+
+      function animateBalanceChange(fromVal, toVal, duration = 650) {
+        const startTime = performance.now();
+        balanceCounterEl.classList.add('pulse-up');
+
+        function frame(now) {
+          const progress = Math.min((now - startTime) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const current = fromVal + (toVal - fromVal) * eased;
+          balanceCounterEl.textContent = current.toFixed(2);
+          if (progress < 1) {
+            requestAnimationFrame(frame);
+          } else {
+            balanceCounterEl.textContent = toVal.toFixed(2);
+            setTimeout(() => balanceCounterEl.classList.remove('pulse-up'), 300);
+          }
+        }
+        requestAnimationFrame(frame);
+      }
+
+      function syncBalanceUI() {
+        balanceCounterEl.textContent = balanceState.toFixed(2);
+        availableBalanceHint.textContent = `Доступно: ${balanceState.toFixed(2)} ₽`;
+      }
+
+      function switchScreen(targetId) {
+        screens.forEach(scr => {
+          scr.classList.toggle('active', scr.id === targetId);
+        });
+        navButtons.forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.target === targetId);
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      // Initialize default UI
+      userIdDisplay.textContent = `ID: #${userNumericId}`;
+      syncBalanceUI();
+
+      // --- TELEGRAM MINI APPS USER PROFILE SYNC ---
+      const tg = window.Telegram?.WebApp;
+      if (tg) {
+        tg.ready();
+        try { tg.expand(); } catch (e) {}
+      }
+
+      const tgUser = tg?.initDataUnsafe?.user;
+      if (tgUser) {
+        const displayName = tgUser.first_name
+          ? `${tgUser.first_name}${tgUser.last_name ? ' ' + tgUser.last_name : ''}`
+          : (tgUser.username ? `@${tgUser.username}` : `ID: #${tgUser.id}`);
+
+        if (userIdDisplay) {
+          userIdDisplay.textContent = displayName;
+        }
+
+        if (authHeaderBtn) {
+          authHeaderBtn.innerHTML = `
+            <span class="status-dot" style="background-color: var(--accent-emerald); box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);"></span>
+            <span>${tgUser.username ? '@' + tgUser.username : tgUser.first_name}</span>
+          `;
+        }
+
+        const profileStatusEl = document.querySelector('.profile-status');
+        if (profileStatusEl) {
+          profileStatusEl.innerHTML = `
+            <i data-lucide="check-circle" width="13" height="13"></i>
+            <span>Авторизован в Telegram</span>
+          `;
+          profileStatusEl.style.color = 'var(--accent-emerald)';
+          profileStatusEl.style.backgroundColor = 'var(--accent-emerald-dim)';
+          profileStatusEl.style.borderColor = 'rgba(16, 185, 129, 0.25)';
+          lucide.createIcons();
+        }
+
+        const avatarContainer = document.querySelector('.avatar-placeholder');
+        if (avatarContainer && tgUser.photo_url) {
+          avatarContainer.innerHTML = `
+            <img src="${tgUser.photo_url}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;" />
+          `;
+          avatarContainer.style.border = '1px solid var(--accent-emerald)';
+        } else if (avatarContainer) {
+          const initial = (tgUser.first_name || 'U')[0].toUpperCase();
+          avatarContainer.innerHTML = `<span style="font-size: 20px; font-weight: 700; color: var(--text-primary);">${initial}</span>`;
+        }
+      }
+
+      // Subtle Live Activity Ticker in Hero Strip
+      const tickerMessages = [
+        'Выплаты СБП активны 24/7',
+        'Участник ID #73910 получил +150 ₽',
+        'Среднее время проверки задачи: 4 мин',
+        'Участник ID #41802 вывел 1250 ₽ на СБП'
+      ];
+      let tickerIdx = 0;
+      setInterval(() => {
+        tickerIdx = (tickerIdx + 1) % tickerMessages.length;
+        liveTickerText.style.opacity = '0';
+        setTimeout(() => {
+          liveTickerText.textContent = tickerMessages[tickerIdx];
+          liveTickerText.style.opacity = '1';
+        }, 200);
+      }, 4500);
+      liveTickerText.style.transition = 'opacity 0.2s ease';
+
+      // --- FILTER CHIPS LOGIC ---
+      filterChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          filterChips.forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          const filter = chip.getAttribute('data-filter');
+
+          taskCards.forEach(card => {
+            if (filter === 'all' || card.getAttribute('data-category') === filter) {
+              card.style.display = 'block';
+            } else {
+              card.style.display = 'none';
+            }
+          });
+        });
+      });
+
+      // --- NAVIGATION EVENTS ---
+      navButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          switchScreen(btn.dataset.target);
+        });
+      });
+
+      authHeaderBtn.addEventListener('click', () => {
+        switchScreen('screen-profile');
+      });
+
+      openReferralScreenBtn.addEventListener('click', () => {
+        switchScreen('screen-referrals');
+      });
+
+      // Task buttons routing
+      document.querySelectorAll('.go-referrals-task').forEach(btn => {
+        btn.addEventListener('click', () => {
+          switchScreen('screen-referrals');
+          showToast('Скопируйте вашу ссылку и отправьте 2 друзьям');
+        });
+      });
+
+      document.querySelectorAll('.auth-required-task').forEach(btn => {
+        btn.addEventListener('click', () => {
+          showToast('Для выполнения заданий войдите в аккаунт через профиль');
+          setTimeout(() => switchScreen('screen-profile'), 850);
+        });
+      });
+
+      // --- REFERRAL COPY ---
+      copyRefBtn.addEventListener('click', async () => {
+        const linkText = refLinkInput.value;
+        try {
+          await navigator.clipboard.writeText(linkText);
+          showToast('Ссылка скопирована');
+        } catch (err) {
+          refLinkInput.select();
+          document.execCommand('copy');
+          showToast('Ссылка скопирована');
+        }
+      });
+
+      // --- BANK SELECTOR RENDERING ---
+      function renderBankLogo(bank) {
+        return `<div class="bank-logo" style="background-color: ${bank.color};">${bank.code}</div>`;
+      }
+
+      function renderBankList(filterText = '') {
+        const query = filterText.trim().toLowerCase();
+        const filtered = BANKS_DATA.filter(b => b.name.toLowerCase().includes(query));
+
+        const topBanks = filtered.filter(b => b.group === 'top');
+        const extraBanks = filtered.filter(b => b.group === 'extra');
+
+        let html = '';
+
+        if (topBanks.length > 0) {
+          html += `<div class="bank-group-label">Популярные банки</div>`;
+          topBanks.forEach(bank => {
+            const isSel = selectedBank && selectedBank.id === bank.id ? 'selected' : '';
+            html += `
+              <div class="bank-option ${isSel}" data-bank-id="${bank.id}">
+                <div class="bank-option-left">
+                  ${renderBankLogo(bank)}
+                  <span class="bank-name">${bank.name}</span>
+                </div>
+              </div>
+            `;
+          });
+        }
+
+        if (extraBanks.length > 0) {
+          html += `<div class="bank-group-label">Все банки СБП</div>`;
+          extraBanks.forEach(bank => {
+            const isSel = selectedBank && selectedBank.id === bank.id ? 'selected' : '';
+            html += `
+              <div class="bank-option ${isSel}" data-bank-id="${bank.id}">
+                <div class="bank-option-left">
+                  ${renderBankLogo(bank)}
+                  <span class="bank-name">${bank.name}</span>
+                </div>
+              </div>
+            `;
+          });
+        }
+
+        if (filtered.length === 0) {
+          html = `<div style="padding: 12px; font-size: 12px; color: var(--text-muted); text-align: center;">Банк не найден</div>`;
+        }
+
+        bankListContainer.innerHTML = html;
+
+        bankListContainer.querySelectorAll('.bank-option').forEach(opt => {
+          opt.addEventListener('click', () => {
+            const bankId = opt.getAttribute('data-bank-id');
+            selectedBank = BANKS_DATA.find(b => b.id === bankId) || null;
+            if (selectedBank) {
+              selectedBankDisplay.innerHTML = `
+                ${renderBankLogo(selectedBank)}
+                <span style="font-weight: 500;">${selectedBank.name}</span>
+              `;
+              bankError.classList.remove('visible');
+              bankDropdownPanel.classList.remove('open');
+            }
+          });
+        });
+      }
+
+      renderBankList();
+
+      bankSelectTrigger.addEventListener('click', () => {
+        bankDropdownPanel.classList.toggle('open');
+        if (bankDropdownPanel.classList.contains('open')) {
+          bankSearchInput.value = '';
+          renderBankList('');
+          setTimeout(() => bankSearchInput.focus(), 60);
+        }
+      });
+
+      bankSearchInput.addEventListener('input', (e) => {
+        renderBankList(e.target.value);
+      });
+
+      // --- PHONE MASK: +7 (XXX) XXX-XX-XX ---
+      sbpPhoneInput.addEventListener('input', (e) => {
+        let digits = e.target.value.replace(/\D/g, '');
+        if (!digits) {
+          e.target.value = '';
+          return;
+        }
+        if (digits[0] === '8' || digits[0] === '7') {
+          digits = digits.substring(1);
+        }
+        digits = digits.substring(0, 10);
+
+        let formatted = '+7';
+        if (digits.length > 0) {
+          formatted += ' (' + digits.substring(0, 3);
+        }
+        if (digits.length >= 4) {
+          formatted += ') ' + digits.substring(3, 6);
+        }
+        if (digits.length >= 7) {
+          formatted += '-' + digits.substring(6, 8);
+        }
+        if (digits.length >= 9) {
+          formatted += '-' + digits.substring(8, 10);
+        }
+        e.target.value = formatted;
+        phoneError.classList.remove('visible');
+        sbpPhoneInput.classList.remove('input-error');
+      });
+
+      sbpPhoneInput.addEventListener('focus', () => {
+        if (!sbpPhoneInput.value) {
+          sbpPhoneInput.value = '+7 (';
+        }
+      });
+
+      // --- PAYOUT MODAL OPEN/CLOSE ---
+      function openPayoutModal() {
+        availableBalanceHint.textContent = `Доступно: ${balanceState.toFixed(2)} ₽`;
+        payoutForm.style.display = 'block';
+        payoutSuccessView.classList.remove('visible');
+        payoutModalBackdrop.classList.add('open');
+        payoutModalBackdrop.setAttribute('aria-hidden', 'false');
+      }
+
+      function closePayoutModal() {
+        payoutModalBackdrop.classList.remove('open');
+        payoutModalBackdrop.setAttribute('aria-hidden', 'true');
+        bankDropdownPanel.classList.remove('open');
+      }
+
+      headerBalanceBtn.addEventListener('click', openPayoutModal);
+      navWithdrawBtn.addEventListener('click', openPayoutModal);
+      openPayoutModalBtn.addEventListener('click', openPayoutModal);
+      closePayoutModalBtn.addEventListener('click', closePayoutModal);
+      donePayoutBtn.addEventListener('click', closePayoutModal);
+
+      payoutModalBackdrop.addEventListener('click', (e) => {
+        if (e.target === payoutModalBackdrop) {
+          closePayoutModal();
+        }
+      });
+
+      recipientNameInput.addEventListener('input', () => {
+        nameError.classList.remove('visible');
+        recipientNameInput.classList.remove('input-error');
+      });
+
+      withdrawAmountInput.addEventListener('input', () => {
+        amountError.classList.remove('visible');
+        withdrawAmountInput.classList.remove('input-error');
+      });
+
+      // --- PAYOUT FORM VALIDATION & SUBMISSION ---
+      payoutForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        let isValid = true;
+
+        const phoneRegex = /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/;
+        if (!phoneRegex.test(sbpPhoneInput.value.trim())) {
+          phoneError.classList.add('visible');
+          sbpPhoneInput.classList.add('input-error');
+          isValid = false;
+        }
+
+        if (!selectedBank) {
+          bankError.classList.add('visible');
+          isValid = false;
+        }
+
+        const nameVal = recipientNameInput.value.trim();
+        const fioRegex = /^[А-ЯЁ][а-яё]+(-[А-ЯЁ][а-яё]+)?\s+[А-ЯЁ]\.\s?[А-ЯЁ]\.$/;
+        if (!fioRegex.test(nameVal)) {
+          nameError.classList.add('visible');
+          recipientNameInput.classList.add('input-error');
+          isValid = false;
+        }
+
+        const amountVal = parseFloat(withdrawAmountInput.value);
+        if (isNaN(amountVal) || amountVal < 1000) {
+          amountError.textContent = 'Минимальная сумма для вывода составляет 1000 ₽';
+          amountError.classList.add('visible');
+          withdrawAmountInput.classList.add('input-error');
+          isValid = false;
+        } else if (amountVal > balanceState) {
+          amountError.textContent = `Недостаточно средств на балансе. Доступно: ${balanceState.toFixed(2)} ₽`;
+          amountError.classList.add('visible');
+          withdrawAmountInput.classList.add('input-error');
+          isValid = false;
+        }
+
+        if (!isValid) return;
+
+        const prevBal = balanceState;
+        balanceState = +(balanceState - amountVal).toFixed(2);
+        localStorage.setItem(STORAGE_KEYS.BALANCE, balanceState.toFixed(2));
+        animateBalanceChange(prevBal, balanceState);
+        availableBalanceHint.textContent = `Доступно: ${balanceState.toFixed(2)} ₽`;
+
+        payoutForm.style.display = 'none';
+        payoutSuccessView.classList.add('visible');
+        payoutForm.reset();
+        selectedBank = null;
+        selectedBankDisplay.innerHTML = `<span style="color: var(--text-muted);">Выберите банк из списка</span>`;
+      });
+
+      // --- RIPPLE MICRO-INTERACTION ---
+      document.querySelectorAll('.ripple-host').forEach(el => {
+        el.addEventListener('click', function (e) {
+          const rect = el.getBoundingClientRect();
+          const circle = document.createElement('span');
+          const size = Math.max(rect.width, rect.height);
+          circle.style.width = circle.style.height = `${size}px`;
+          circle.style.left = `${e.clientX - rect.left - size / 2}px`;
+          circle.style.top = `${e.clientY - rect.top - size / 2}px`;
+          circle.classList.add('ripple-circle');
+          el.appendChild(circle);
+          setTimeout(() => circle.remove(), 600);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
